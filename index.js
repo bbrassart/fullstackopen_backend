@@ -5,7 +5,18 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 const morganMiddleWare = require('morgan');
-app.use(morganMiddleWare('tiny'));
+morganMiddleWare.token('payload', request => JSON.stringify(request.body));
+
+app.use(morganMiddleWare((tokens, req, res) => {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms',
+    tokens['payload'](req, res),
+  ].join(' ')
+}));
 
 let persons = [
   {
