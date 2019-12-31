@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morganMiddleWare = require('morgan');
 
+app.use(express.static('build'));
 app.use(cors());
 app.use(bodyParser.json());
 morganMiddleWare.token('payload', request => JSON.stringify(request.body));
