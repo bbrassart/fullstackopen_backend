@@ -23,29 +23,6 @@ app.use(morganMiddleWare((tokens, req, res) => {
   ].join(' ')
 }));
 
-let persons = [
-  {
-    name: 'Arto Hellas',
-    number: '040-123456',
-    id: 1
-  },
-  {
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-    id: 2
-  },
-  {
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-    id: 3
-  },
-  {
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-    id: 4
-  }
-];
-
 app.get('/api/persons', (request, response) => {
   Person
     .find({})
@@ -61,35 +38,37 @@ app.post('/api/persons', (request, response) => {
     });
   }
 
-  if(persons.some(person => person.name === name)) {
-    return response.status(400).json({
-      error: 'name must be unique'
+  const person = new Person({ name, number });
+
+  person
+    .save()
+    .then(savedPerson => {
+      response.json(savedPerson.toJSON())
     });
-  }
-
-  const person = {
-    name,
-    number,
-    id: Math.ceil(Math.random() * 10000000)
-  };
-
-  persons = persons.concat(person);
-  response.json(person);
 });
 
 app.get('/api/persons/:id', (request, response) => {
-  const requestedPerson = persons.find(person => person.id === Number(request.params.id));
-  requestedPerson ? response.json(requestedPerson) : response.status(404).end();
+  Person
+    .findById(request.params.id)
+    .then(person => {
+      response.json(person.toJSON());
+    });
 });
 
 app.get('/info', (request, response) => {
-  const html = `<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`;
-  response.send(html);
+  Person.countDocuments({})
+    .then(count => {
+      const html = `<p>Phonebook has info for ${count} people</p><p>${new Date()}</p>`;
+      response.send(html);
+    });
 });
 
 app.delete('/api/persons/:id', (request, response) => {
-  persons = persons.filter(person => person.id !== Number(request.params.id));
-  response.status(204).end();
+  Person
+    .findByIdAndRemove(request.params.id)
+    .then(() => {
+      response.status(204).end();
+    });
 });
 
 const PORT = process.env.PORT;
