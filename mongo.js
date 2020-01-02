@@ -24,8 +24,8 @@ if (process.argv.length === 3) {
   Person
     .find({})
     .then(resp => {
-      console.log(`Phonebook`);
-      resp.forEach(contact => { console.log(contact.name, contact.number) });
+      console.log('Phonebook');
+      resp.forEach(contact => { console.log(contact.name, contact.number); });
       mongoose.connection.close();
     });
 } else {
