@@ -58,6 +58,18 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error));
 });
 
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body;
+
+  const updatedPerson = { name, number };
+
+  Person.findByIdAndUpdate(request.params.id, updatedPerson, { new: true })
+    .then(updatedPerson => {
+      response.json(updatedPerson.toJSON())
+    })
+    .catch(error => next(error))
+});
+
 app.get('/info', (request, response, next) => {
   Person.countDocuments({})
     .then(count => {
